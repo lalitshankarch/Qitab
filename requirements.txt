@@ -1,0 +1,7 @@
+bottle==0.12.25
+lxml==5.3.0
+proxy_tools==0.1.0
+pycairo==1.26.1
+PyGObject==3.48.2
+pywebview==5.2
+typing_extensions==4.12.2
