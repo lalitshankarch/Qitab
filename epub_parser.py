@@ -3,8 +3,9 @@ import zipfile
 from collections import OrderedDict
 from typing import Any, Dict
 
-import constants
 from lxml import etree
+
+import constants
 
 
 class EpubParser:
