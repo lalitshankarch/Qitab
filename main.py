@@ -28,8 +28,6 @@ def main():
         print("Invalid EPUB container")
         return
     print("EPUB archive seems valid")
-
-    # Use tempfile to create a temporary directory
     with tempfile.TemporaryDirectory() as temp_dir:
         output_dir = pathlib.Path(temp_dir)
         print(f"Extract to {output_dir}")
@@ -47,7 +45,6 @@ def main():
         except ValueError as e:
             print(e)
             return
-
         print(f"Parse {container_props['full-path']}")
         try:
             content_props = epub_parser.get_content_props(
@@ -58,7 +55,6 @@ def main():
         except ValueError as e:
             print(e)
             return
-
         end_time = time.time()
         print(f"Parsed in {end_time - start_time:.3f} seconds")
         toc_headers = list(content_props["table_of_contents"].keys())
@@ -68,38 +64,16 @@ def main():
         )
         file_path = f"file://{file_path}"
         print(f"Render {file_path}")
+        js_file_path = pathlib.Path("script/user.js")
 
         def inject_js(window):
-            js_code = """
-            var style = document.createElement('style');
-            style.type = 'text/css';
-            style.innerHTML = `
-            body {
-                font-size: 1.25em !important;
-                font-family: "C059" !important;
-                font-weight: 400 !important;
-                max-width: min(75vw, 50em) !important;
-                margin: 2.5em auto !important;
-                filter: sepia(80%) !important;
-            }
-            a {
-                font-size: 0.75em !important;
-            }
-            `;
-            document.head.appendChild(style);
-            document.addEventListener('keydown', function(event) {
-                if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
-                    window.pywebview.api.keypress(event.key);
-                }
-            });
-            document.addEventListener('click', function(event) {
-                if (event.target.tagName === 'a' && event.target.href.startsWith('http')) {
-                    event.preventDefault();
-                    window.pywebview.api.open_external_link(event.target.href);
-                }
-            });
-            """
-            window.evaluate_js(js_code)
+            try:
+                with open(js_file_path, "r") as js_file:
+                    js_src = js_file.read()
+            except FileNotFoundError:
+                print(f"JavaScript file not found: {js_file_path}")
+                return
+            window.evaluate_js(js_src)
 
         class WebviewAPI:
             def __init__(self) -> None:
@@ -133,11 +107,12 @@ def main():
             width=750,
             height=900,
             min_size=(800, 600),
+            zoomable=True,
             text_select=True,
             js_api=WebviewAPI(),
         )
         window.events.loaded += lambda: inject_js(window)
-        webview.start()
+        webview.start(private_mode=False)
 
 
 if __name__ == "__main__":
