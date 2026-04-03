@@ -7,6 +7,8 @@ from lxml import etree
 
 import constants
 
+_SAFE_PARSER = etree.XMLParser(resolve_entities=False, no_network=True)
+
 
 class EpubParser:
     def is_valid_container(self, path: pathlib.Path) -> bool:
@@ -40,7 +42,7 @@ class EpubParser:
         Returns:
             dict: A dictionary containing `full-path` and `media-type` of content.opf.
         """
-        tree = etree.parse(path, None)
+        tree = etree.parse(path, _SAFE_PARSER)
         root = tree.getroot()
         rootfiles = root.find("rootfiles", namespaces=root.nsmap)
         if rootfiles is None:
@@ -67,7 +69,7 @@ class EpubParser:
         Returns:
             dict: A dictionary containing Dublin Core metadata, TOC, and cover image location.
         """
-        tree = etree.parse(path, None)
+        tree = etree.parse(path, _SAFE_PARSER)
         root = tree.getroot()
         metadata = root.find("metadata", namespaces=root.nsmap)
         if metadata is None:
@@ -127,7 +129,7 @@ class EpubParser:
             else:
                 pass
         ncx_path = path.parent.joinpath(ncx_path)
-        ncx_tree = etree.parse(ncx_path, None)
+        ncx_tree = etree.parse(ncx_path, _SAFE_PARSER)
         ncx_root = ncx_tree.getroot()
         navmap = ncx_root.find("navMap", namespaces=ncx_root.nsmap)
         hrefs_name_set = {href.split("/")[-1] for href in hrefs_set}

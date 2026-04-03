@@ -58,13 +58,16 @@ def main():
         end_time = time.time()
         print(f"Parsed in {end_time - start_time:.3f} seconds")
         toc_headers = list(content_props["table_of_contents"].keys())
+        if not toc_headers:
+            print("No table of contents found")
+            return
         root_path = path.parts[0] if len(path.parts) > 1 else path.parent
         file_path = output_dir.joinpath(
             root_path, content_props["table_of_contents"][toc_headers[0]]
         )
         file_path = f"file://{file_path}"
         print(f"Render {file_path}")
-        js_file_path = pathlib.Path("script/user.js")
+        js_file_path = pathlib.Path(__file__).parent / "script" / "user.js"
 
         def inject_js(window):
             try:
@@ -106,7 +109,7 @@ def main():
             file_path,
             width=750,
             height=900,
-            min_size=(800, 600),
+            min_size=(750, 600),
             zoomable=True,
             text_select=True,
             js_api=WebviewAPI(),
