@@ -1,5 +1,9 @@
-bottle==0.13.3
-lxml==5.4.0
+bottle==0.13.4
+cffi==2.0.0
+clr_loader==0.2.10
+lxml==6.0.2
 proxy_tools==0.1.0
-pywebview==5.4
-typing_extensions==4.13.2
+pycparser==3.0
+pythonnet==3.1.0rc0
+pywebview==6.1
+typing_extensions==4.15.0
